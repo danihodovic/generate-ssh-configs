@@ -98,6 +98,7 @@ function fzf-ssh {
   zle reset-prompt
 }
 zle     -N     fzf-ssh
+bindkey "^s" fzf-ssh
 ```
 
 ## Features
