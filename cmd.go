@@ -11,6 +11,7 @@ var sshUser string
 var identityFile string
 var jumphost string
 var filters string
+var privateIP bool
 
 var rootCmd = &cobra.Command{
 	Use: "generate-ssh-configs",
@@ -90,6 +91,12 @@ func cmdInit() {
 		"filters",
 		"",
 		"AWS instance filters",
+	)
+	awsCmd.Flags().BoolVar(
+		&privateIP,
+		"privateip",
+		false,
+		"Use AWS private IP only",
 	)
 
 	rootCmd.AddCommand(awsCmd)

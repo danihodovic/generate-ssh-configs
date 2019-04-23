@@ -289,7 +289,12 @@ func generateAWS(prefix string) {
 
 		var tmplData map[string]string
 
-		if isInPublicSubnet && isPortOpen {
+		if privateIP {
+			tmplData = map[string]string{
+				"Domain": hostName,
+				"IP":     *instance.PrivateIpAddress,
+			}
+		} else if isInPublicSubnet && isPortOpen {
 			tmplData = map[string]string{
 				"Domain": hostName,
 				"IP":     *instance.PublicIpAddress,

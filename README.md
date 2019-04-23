@@ -37,15 +37,23 @@ See https://www.digitalocean.com/docs/api/create-personal-access-token/
 ### Generate ssh configs for all AWS instances
 Uses the current AWS region (`AWS_DEFAULT_REGION`) and generates all
 configs using the EC2 API.
-```
+
+```shell
 generate-ssh-configs aws --prefix myservers --user myuser > ~/.ssh/config-myservers
+```
+
+### Generate ssh configs for all AWS instances forcing private IP addresses
+
+```shell
+generate-ssh-configs aws --prefix myservers --user myuser --privateip > ~/.ssh/config-myservers
 ```
 
 ### AWS multi-region, multi-environment setup
 Using multiple regions, environments and jumphosts for each region and
 environment. This works if all of your environments are contained in a single
 AWS account and separated by VPC and tags.
-```
+
+```shell
 # Generate configs for dev,test,prod in eu-west-1
 AWS_DEFAULT_REGION=eu-west-1 generate-ssh-configs aws \
     --prefix myorg-dev-eu-west-1 \
@@ -83,10 +91,31 @@ Using some bash magic we can quickly to select the server we want to ssh to.
 
 Here is an example of using fzf and zsh to quickly select a server. Pressing
 Ctrl+s in a terminal launches fzf-ssh. Place the script in your `~/.zshrc`
-```
+
+```shell
 stty stop undef
 function fzf-ssh {
   all_matches=$(grep -P -r "Host\s+\w+" ~/.ssh/ | grep -v '\*')
+  only_host_parts=$(echo "$all_matches" | awk '{print $NF}')
+  selection=$(echo "$only_host_parts" | fzf)
+  echo $selection
+
+  if [ ! -z $selection ]; then
+    BUFFER="ssh $selection"
+    zle accept-line
+  fi
+  zle reset-prompt
+}
+zle     -N     fzf-ssh
+bindkey "^s" fzf-ssh
+```
+
+### Using [RipGrep](https://github.com/BurntSushi/ripgrep)
+
+```shell
+stty stop undef
+function fzf-ssh {
+  all_matches=$(rg "Host\s+\w+" ~/.ssh/config* | rg -v '\*')
   only_host_parts=$(echo "$all_matches" | awk '{print $NF}')
   selection=$(echo "$only_host_parts" | fzf)
   echo $selection
