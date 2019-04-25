@@ -11,6 +11,7 @@ var sshUser string
 var identityFile string
 var jumphost string
 var filters string
+var openSubnet string
 
 var rootCmd = &cobra.Command{
 	Use: "generate-ssh-configs",
@@ -90,6 +91,12 @@ func cmdInit() {
 		"filters",
 		"",
 		"AWS instance filters",
+	)
+	awsCmd.Flags().StringVar(
+		&openSubnet,
+		"subnet",
+		"",
+		"Additional open subnet",
 	)
 
 	rootCmd.AddCommand(awsCmd)
