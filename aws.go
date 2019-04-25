@@ -179,10 +179,15 @@ func isPortOpen(ec2Client *ec2.EC2, inst *ec2.Instance) bool {
 		panic(err)
 	}
 
+	publicSubnets := []string{"0.0.0.0/0"}
+	if openSubnet != "" {
+		publicSubnets = append(publicSubnets, openSubnet)
+	}
+
 	for _, securityGroup := range securityGroupOutput.SecurityGroups {
 		for _, permission := range securityGroup.IpPermissions {
 			protocolOk := (*permission.IpProtocol == "tcp" || *permission.IpProtocol == "-1")
-			publicIpRanges := usesPublicIpRanges(permission.IpRanges)
+			publicIpRanges := usesPublicIpRanges(permission.IpRanges, publicSubnets)
 
 			if permission.FromPort == nil && permission.ToPort == nil &&
 				publicIpRanges &&
@@ -203,10 +208,12 @@ func isPortOpen(ec2Client *ec2.EC2, inst *ec2.Instance) bool {
 	return false
 }
 
-func usesPublicIpRanges(ipRanges []*ec2.IpRange) bool {
+func usesPublicIpRanges(ipRanges []*ec2.IpRange, subnets []string) bool {
 	for _, r := range ipRanges {
-		if *r.CidrIp == "0.0.0.0/0" {
-			return true
+		for _, s := range subnets {
+			if *r.CidrIp == s {
+				return true
+			}
 		}
 	}
 

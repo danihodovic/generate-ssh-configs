@@ -108,6 +108,7 @@ bindkey "^s" fzf-ssh
   - Uses the public IP if
     - the instance is in a public subnet
     - the security group allows ingress port 22 from the public internet
+    - the security group allows ingress port 22 from subnet provided via `--subnet` flag
   - Otherwise it uses the private IP and routes through the jumphost if one is
     configured.
 - **DigitalOcean**
