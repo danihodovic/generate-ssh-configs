@@ -13,7 +13,7 @@ import (
 const tmpl = `
 {{ range $_, $d := .Instances -}}
 Host {{ $.Prefix }}{{ $d.Name }}
-  HostName {{ ( index $d.Networks.V4 0).IPAddress }}
+  HostName {{ ( index $d.Networks.V4 1).IPAddress }}
 {{ end}}
 
 Host {{ .Prefix }}*
